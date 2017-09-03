@@ -103,6 +103,7 @@ export default class Camera extends Component {
     onZoomChanged: PropTypes.func,
     mirrorImage: PropTypes.bool,
     fixOrientation: PropTypes.bool,
+    focusBeforeCapture: PropTypes.bool,
     barCodeTypes: PropTypes.array,
     orientation: PropTypes.oneOfType([
       PropTypes.string,
@@ -124,6 +125,7 @@ export default class Camera extends Component {
     type: CameraManager.Type.back,
     orientation: CameraManager.Orientation.auto,
     fixOrientation: false,
+    focusBeforeCapture: false,
     captureAudio: false,
     captureMode: CameraManager.CaptureMode.still,
     captureTarget: CameraManager.CaptureTarget.cameraRoll,
@@ -224,6 +226,7 @@ export default class Camera extends Component {
       description: '',
       mirrorImage: props.mirrorImage,
       fixOrientation: props.fixOrientation,
+      focusBeforeCapture: props.focusBeforeCapture,
       ...options
     };
 

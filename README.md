@@ -305,6 +305,10 @@ If set to `true`, the image returned will be rotated to the _right way up_.  WAR
 could please submit a PR and include the make model of the device.  We believe that it's not 
 required functionality any more and would like to remove it._) 
 
+#### `Android` `focusBeforeCapture`
+
+If set to `true`, a full autofocus cycle will be run before taking the picture (Android). 
+
 ## Component instance methods
 
 You can access component methods by adding a `ref` (ie. `ref="camera"`) prop to your `<Camera>` element, then you can use `this.refs.camera.capture(cb)`, etc. inside your component.

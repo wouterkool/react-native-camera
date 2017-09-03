@@ -502,6 +502,11 @@ public class RCTCameraModule extends ReactContextBaseJavaModule
     }
 
     private void captureWithOrientation(final ReadableMap options, final Promise promise, int deviceOrientation) {
+        if (!mSafeToCapture){
+            promise.reject("Already capturing!");
+            return;
+        }
+
         Camera camera = RCTCamera.getInstance().acquireCameraInstance(options.getInt("type"));
         if (null == camera) {
             promise.reject("No camera found.");
@@ -527,10 +532,15 @@ public class RCTCameraModule extends ReactContextBaseJavaModule
         RCTCamera.getInstance().adjustCameraRotationToDeviceOrientation(options.getInt("type"), deviceOrientation);
         camera.setPreviewCallback(null);
 
-        Camera.PictureCallback captureCallback = new Camera.PictureCallback() {
+        final boolean focusBeforeCapture = options.getBoolean("focusBeforeCapture");
+
+        final Camera.PictureCallback captureCallback = new Camera.PictureCallback() {
             @Override
             public void onPictureTaken(final byte[] data, Camera camera) {
                 camera.stopPreview();
+                if (focusBeforeCapture){
+                    camera.cancelAutoFocus();
+                }
                 camera.startPreview();
 
                 AsyncTask.execute(new Runnable() {
@@ -544,13 +554,19 @@ public class RCTCameraModule extends ReactContextBaseJavaModule
             }
         };
 
-        if(mSafeToCapture) {
-          try {
-            camera.takePicture(null, null, captureCallback);
+        try {
+            if (focusBeforeCapture){
+                camera.autoFocus(new Camera.AutoFocusCallback() {
+                    public void onAutoFocus(boolean success, Camera camera) {
+                        camera.takePicture(null, null, captureCallback);
+                    }
+                });
+            } else {
+                camera.takePicture(null, null, captureCallback);
+            }
             mSafeToCapture = false;
-          } catch(RuntimeException ex) {
-              Log.e(TAG, "Couldn't capture photo.", ex);
-          }
+        } catch(RuntimeException ex) {
+            Log.e(TAG, "Couldn't capture photo.", ex);
         }
     }
 
